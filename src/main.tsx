@@ -6,6 +6,8 @@ import App from './App';
 import NotFound from './pages/404';
 import Podcast from './pages/Podcast';
 import Episode from './pages/Episode';
+import { Provider } from 'react-redux';
+import { store } from './state/store.ts';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );
