@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../state/store';
 import { getFirst100Podcast } from '../state/podcastSlice';
 import { Link } from 'react-router-dom';
+import PodcastCard from '../components/podcastCard';
 
 export default function Home() {
   const { podcasts, loading, error } = useSelector((state: RootState) => state.podcasts);
@@ -29,7 +30,7 @@ export default function Home() {
       <div className="grid grid-cols-4 gap-4">
         {podcasts.map((podcast, i) => (
           <Link key={`podcast-${i}`} to={`/podcast/${podcast}`}>
-            <div className="bg-red-200 py-32 text-center">{podcast['im:name'].label}</div>
+            <PodcastCard podcast={podcast} />
           </Link>
         ))}
       </div>
