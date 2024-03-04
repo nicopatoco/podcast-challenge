@@ -3,7 +3,7 @@ import Episodes from '../components/Episodes';
 import Header from '../components/header';
 import Episode from './Episode';
 
-export default function Podcast() {
+export default function PodcastDetail() {
   const params = useParams<{ podcastId: string }>();
   const location = useLocation();
   const isEpisodePage = location.pathname.includes('/episode/');

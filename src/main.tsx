@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
 import App from './App';
 import NotFound from './pages/404';
-import Podcast from './pages/Podcast';
+import PodcastDetail from './pages/PodcastDetail.tsx';
 import Episode from './pages/Episode';
 import { Provider } from 'react-redux';
 import { store } from './state/store.ts';
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/podcast/:podcastId',
-    element: <Podcast />,
+    element: <PodcastDetail />,
     children: [
       {
         path: '/podcast/:podcastId/episode/:episodeId',
