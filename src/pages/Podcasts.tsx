@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../state/store';
-import { getFirst100Podcast } from '../state/podcastSlice';
 import { Link } from 'react-router-dom';
-import PodcastCard from '../components/podcastCard';
+import { getFirst100Podcast } from '../state/podcastSlice';
+import { AppDispatch, RootState } from '../state/store';
+import PodcastCard from '../components/PodcastCard';
 
 export default function Podcasts() {
   const { podcasts, loading, error } = useSelector((state: RootState) => state.podcasts);
@@ -35,22 +35,26 @@ export default function Podcasts() {
 
   return (
     <>
-      <div className="flex flex-row my-4 justify-end gap-2">
-        <div className="bg-blue-400 text-white rounded text-lg p-1">{filteredPodcasts.length}</div>
-        <input
-          className="border border-gray-400 mr-4 rounded text-lg w-64 h-8"
-          type="text"
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder="Filter podcast..."
-        ></input>
-      </div>
-      <div className="grid grid-cols-4 gap-4">
-        {filteredPodcasts.map((podcast, i) => (
-          <Link key={`podcast-${i}`} to={`/podcast/${podcast}`}>
-            <PodcastCard podcast={podcast} />
-          </Link>
-        ))}
-      </div>
+      {filteredPodcasts && (
+        <>
+          <div className="flex flex-row justify-end gap-2 my-4">
+            <div className="p-1 text-lg text-white bg-blue-400 rounded">{filteredPodcasts.length}</div>
+            <input
+              className="w-64 h-8 mr-4 text-lg border border-gray-400 rounded"
+              type="text"
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="Filter podcast..."
+            ></input>
+          </div>
+          <div className="grid grid-cols-4 gap-4">
+            {filteredPodcasts.map((podcast, i) => (
+              <Link key={`podcast-${i}`} to={{ pathname: `/podcast/${podcast.id.attributes['im:id']}` }}>
+                <PodcastCard podcast={podcast} />
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
