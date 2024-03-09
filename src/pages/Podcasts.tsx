@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import ErrorDisplay from '../components/ErrorDisplay';
+import LoadingDisplay from '../components/LoadingDisplay';
+import PodcastList from '../components/PodcastList';
 import { getFirst100Podcast } from '../state/podcastSlice';
 import { AppDispatch, RootState } from '../state/store';
-import PodcastCard from '../components/PodcastCard';
 
 export default function Podcasts() {
   const { podcasts, loading, error } = useSelector((state: RootState) => state.podcasts);
@@ -26,11 +27,11 @@ export default function Podcasts() {
   }, [podcasts, filter]);
 
   if (loading) {
-    return <div>Loading podcasts...</div>;
+    return <LoadingDisplay />;
   }
 
   if (error) {
-    return <div>Error fetching podcasts: {error}</div>;
+    return <ErrorDisplay error={error} />;
   }
 
   return (
@@ -44,15 +45,9 @@ export default function Podcasts() {
               type="text"
               onChange={(e) => setFilter(e.target.value)}
               placeholder="Filter podcast..."
-            ></input>
+            />
           </div>
-          <div className="grid grid-cols-4 gap-4">
-            {filteredPodcasts.map((podcast, i) => (
-              <Link key={`podcast-${i}`} to={{ pathname: `/podcast/${podcast.id.attributes['im:id']}` }}>
-                <PodcastCard podcast={podcast} />
-              </Link>
-            ))}
-          </div>
+          <PodcastList podcasts={filteredPodcasts} />
         </>
       )}
     </>
