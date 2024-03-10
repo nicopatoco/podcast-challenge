@@ -2,7 +2,7 @@ import { PodcastEntry } from '../types/podcast';
 
 export default function PodcastCard({ podcast }: { podcast: PodcastEntry }) {
   return (
-    <div className="max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+    <div className="h-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
       <div className="flex flex-col items-center">
         <div className="w-24 h-24 mb-3 overflow-hidden rounded-full shadow-lg">
           <img
