@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 import { getEpisodes } from '../state/episodeSlice';
 import { AppDispatch, RootState } from '../state/store';
 import LoadingDisplay from './LoadingDisplay';
@@ -50,6 +50,7 @@ export default function Episodes({ podcastId }: { podcastId: string }) {
             ))}
           </tbody>
         </table>
+        <Outlet />
       </div>
     </div>
   );
