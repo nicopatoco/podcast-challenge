@@ -25,13 +25,15 @@ export const getFirst100Podcast = createAsyncThunk(
 
     // Check if the lastFetch is more than one day old
     if (state.podcasts.lastFetch && now - state.podcasts.lastFetch < oneDay) {
-      return state.podcasts.podcasts;
+      return { podcast: state.podcasts.podcasts };
     }
 
     try {
-      const res = await axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json');
+      const res: PodcastsFeed = (
+        await axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')
+      ).data.feed;
       dispatch(podcastSlice.actions.updateLastFetch(Date.now()));
-      return res.data.feed;
+      return { podcast: res.entry, cache: false } as { podcast: PodcastEntry[] };
     } catch (error) {
       if (axios.isAxiosError(error)) {
         return rejectWithValue(error.message);
@@ -56,8 +58,9 @@ const podcastSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getFirst100Podcast.fulfilled, (state, action: PayloadAction<PodcastsFeed>) => {
-        state.podcasts = action.payload.entry;
+      .addCase(getFirst100Podcast.fulfilled, (state, action) => {
+        const { podcast } = action.payload;
+        state.podcasts = podcast;
         state.loading = false;
       })
       .addCase(getFirst100Podcast.rejected, (state, action) => {
