@@ -4,7 +4,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { getEpisodes } from '../state/episodeSlice';
 import { AppDispatch, RootState } from '../state/store';
 import ErrorDisplay from './ErrorDisplay';
-import LoadingDisplay from './LoadingDisplay';
+import Skeleton from './Skeleton';
 
 export default function Episodes({ podcastId }: { podcastId: string }) {
   const { episodes, loading, error } = useSelector((state: RootState) => state.episodes);
@@ -17,7 +17,12 @@ export default function Episodes({ podcastId }: { podcastId: string }) {
   }, [dispatch, podcastId]);
 
   if (loading) {
-    return <LoadingDisplay />;
+    return (
+      <div className="w-full">
+        <Skeleton width="mb-4 w-full" />
+        <Skeleton width="w-full" density={6} />
+      </div>
+    );
   }
 
   if (error) {

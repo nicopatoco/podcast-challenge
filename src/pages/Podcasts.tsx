@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ErrorDisplay from '../components/ErrorDisplay';
-import LoadingDisplay from '../components/LoadingDisplay';
 import PodcastList from '../components/PodcastList';
+import Skeleton from '../components/Skeleton';
 import { getFirst100Podcast } from '../state/podcastSlice';
 import { AppDispatch, RootState } from '../state/store';
 
@@ -27,7 +27,12 @@ export default function Podcasts() {
   }, [podcasts, filter]);
 
   if (loading) {
-    return <LoadingDisplay />;
+    const skeletonLines = Array.from({ length: 8 }, (_, index) => <Skeleton density={3} key={index} />);
+    return (
+      <div className="mt-16">
+        <div className="grid grid-cols-4 gap-4">{skeletonLines}</div>;
+      </div>
+    );
   }
 
   if (error) {
