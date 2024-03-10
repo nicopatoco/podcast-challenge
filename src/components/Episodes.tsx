@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, Outlet } from 'react-router-dom';
 import { getEpisodes } from '../state/episodeSlice';
 import { AppDispatch, RootState } from '../state/store';
-import LoadingDisplay from './LoadingDisplay';
 import ErrorDisplay from './ErrorDisplay';
+import LoadingDisplay from './LoadingDisplay';
 
 export default function Episodes({ podcastId }: { podcastId: string }) {
   const { episodes, loading, error } = useSelector((state: RootState) => state.episodes);
