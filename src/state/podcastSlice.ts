@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { PodcastEntry, PodcastsFeed } from '../types/podcast';
+import { now, oneDay } from '../functions/helpers';
 
 interface PodcastState {
   podcasts: PodcastEntry[];
@@ -20,11 +21,9 @@ export const getFirst100Podcast = createAsyncThunk(
   'podcasts/getFirst100Podcast',
   async (_, { getState, dispatch, rejectWithValue }) => {
     const state = getState() as { podcasts: PodcastState };
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
 
     // Check if the lastFetch is more than one day old
-    if (state.podcasts.lastFetch && now - state.podcasts.lastFetch < oneDay) {
+    if (state.podcasts.lastFetch && now() - state.podcasts.lastFetch < oneDay()) {
       return { podcast: state.podcasts.podcasts };
     }
 
@@ -32,7 +31,7 @@ export const getFirst100Podcast = createAsyncThunk(
       const res: PodcastsFeed = (
         await axios.get('https://itunes.apple.com/us/rss/toppodcasts/limit=100/genre=1310/json')
       ).data.feed;
-      dispatch(podcastSlice.actions.updateLastFetch(Date.now()));
+      dispatch(podcastSlice.actions.updateLastFetch(now()));
       return { podcast: res.entry, cache: false } as { podcast: PodcastEntry[] };
     } catch (error) {
       if (axios.isAxiosError(error)) {

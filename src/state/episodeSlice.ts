@@ -1,15 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { PodcastEpisode } from '../types/episode';
+import { now, oneDay } from '../functions/helpers';
 
 interface AlbumEpisodes {
   key: string;
   value: PodcastEpisode[];
+  lastFetch: number; // Each album's episodes have their own lastFetch
 }
 
 interface EpisodeState {
   albumEpisodes: AlbumEpisodes[];
   episodes: PodcastEpisode[];
-  lastFetch: number | null; // Timestamp of the last fetch
   loading: boolean;
   error: string | null;
 }
@@ -17,7 +18,6 @@ interface EpisodeState {
 const initialState: EpisodeState = {
   albumEpisodes: [],
   episodes: [],
-  lastFetch: null,
   loading: false,
   error: null,
 };
@@ -26,13 +26,11 @@ export const getEpisodes = createAsyncThunk(
   'episodes/getEpisodes',
   async (podcastId: string, { getState, rejectWithValue }) => {
     const state = getState() as { episodes: EpisodeState };
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
     const episodeCache = state.episodes.albumEpisodes.find((e) => e.key.toString() === podcastId);
 
     // Check if the lastFetch is more than one day old
-    if (episodeCache && state.episodes.lastFetch && now - state.episodes.lastFetch < oneDay) {
-      return { podcastId, episodes: episodeCache.value, cache: true };
+    if (episodeCache && episodeCache.lastFetch && now() - episodeCache.lastFetch < oneDay()) {
+      return { podcastId, episodes: episodeCache.value };
     }
 
     try {
@@ -46,7 +44,9 @@ export const getEpisodes = createAsyncThunk(
       const episodes: PodcastEpisode[] = JSON.parse(data.contents).results;
       episodes.shift(); // Take episode reference
 
-      return { podcastId, episodes, cache: false };
+      const sortedEpisodes = episodes.sort((a: PodcastEpisode, b: PodcastEpisode) => a.releaseDate - b.releaseDate);
+
+      return { podcastId, episodes: sortedEpisodes };
     } catch (error) {
       return rejectWithValue('An unknown error occurred');
     }
@@ -64,25 +64,23 @@ const episodesSlice = createSlice({
         state.error = null;
       })
       .addCase(getEpisodes.fulfilled, (state, action) => {
-        const { podcastId, episodes, cache } = action.payload;
+        const { podcastId, episodes } = action.payload;
 
-        if (!cache) {
-          const sortedEpisodes: PodcastEpisode[] = episodes.sort(
-            (a: PodcastEpisode, b: PodcastEpisode) => a.releaseDate - b.releaseDate
-          );
-
-          const index = state.albumEpisodes.findIndex((e) => e.key === podcastId);
-
-          if (index === -1) {
-            state.albumEpisodes.push({ key: podcastId, value: sortedEpisodes }); // Add a new list of episodes
-          } else {
-            state.albumEpisodes[index].value = sortedEpisodes;
-          }
-          state.lastFetch = Date.now(); // Update the lastFetch timestamp
-          state.episodes = sortedEpisodes;
+        const index = state.albumEpisodes.findIndex((e) => e.key === podcastId);
+        if (index === -1) {
+          // Add a new list of episodes with current timestamp
+          state.albumEpisodes.push({
+            key: podcastId,
+            value: episodes,
+            lastFetch: now(),
+          });
         } else {
-          state.episodes = episodes;
+          // Update existing list of episodes and its lastFetch timestamp
+          state.albumEpisodes[index].value = episodes;
+          state.albumEpisodes[index].lastFetch = now();
         }
+        // This is cos I want to have the episode in the context
+        state.episodes = episodes;
         state.loading = false;
       })
       .addCase(getEpisodes.rejected, (state, action) => {
