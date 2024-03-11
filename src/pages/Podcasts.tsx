@@ -1,19 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo, useState } from 'react';
 import ErrorDisplay from '../components/ErrorDisplay';
 import PodcastList from '../components/PodcastList';
 import Skeleton from '../components/Skeleton';
-import { getFirst100Podcast } from '../state/podcastSlice';
-import { AppDispatch, RootState } from '../state/store';
+import usePodcasts from '../hooks/usePodcasts';
 
 export default function Podcasts() {
-  const { podcasts, loading, error } = useSelector((state: RootState) => state.podcasts);
-  const dispatch = useDispatch<AppDispatch>();
+  const { podcasts, loading, error } = usePodcasts();
   const [filter, setFilter] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    dispatch(getFirst100Podcast());
-  }, [dispatch]);
 
   const filteredPodcasts = useMemo(() => {
     if (filter) {

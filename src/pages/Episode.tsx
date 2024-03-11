@@ -1,22 +1,12 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import EpisodeDetails from '../components/EpisodeDetails';
 import ErrorDisplay from '../components/ErrorDisplay';
 import LoadingDisplay from '../components/LoadingDisplay';
-import { getEpisodes } from '../state/episodeSlice';
-import { AppDispatch, RootState } from '../state/store';
+import useEpisodes from '../hooks/useEpisodes';
 
 export default function Episode() {
-  const params = useParams<{ episodeId: string; podcastId: string }>();
-  const { episodes, loading, error } = useSelector((state: RootState) => state.episodes);
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    if (params?.podcastId) {
-      dispatch(getEpisodes(params.podcastId));
-    }
-  }, [dispatch, params]);
+  const { podcastId, episodeId } = useParams();
+  const { episodes, loading, error } = useEpisodes(podcastId);
 
   if (loading) {
     return <LoadingDisplay />;
@@ -26,7 +16,7 @@ export default function Episode() {
     return <ErrorDisplay error={error} />;
   }
 
-  const episode = episodes.find((e) => e.trackId.toString() === params?.episodeId);
+  const episode = episodeId ? episodes.find((e) => e.trackId.toString() === episodeId) : undefined;
 
   return <>{episode && <EpisodeDetails episode={episode} />}</>;
 }
